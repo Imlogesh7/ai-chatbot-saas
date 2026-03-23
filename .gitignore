@@ -1,0 +1,11 @@
+node_modules
+dist
+.env
+/backend/uploads
+/backend/generated
+/frontend-old
+/test-widget.html
+~$*
+*.docx
+*.pptx
+.DS_Store
