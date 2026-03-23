@@ -110,7 +110,7 @@ model DocumentChunk {
   content    String
   chunkIndex Int                    @map("chunk_index")
   tokenCount Int                    @map("token_count")
-  embedding  Unsupported("vector(768)")?
+  embedding  Unsupported("vector")?
   documentId String                 @map("document_id")
   document   Document               @relation(fields: [documentId], references: [id], onDelete: Cascade)
   createdAt  DateTime               @default(now()) @map("created_at")

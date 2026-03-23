@@ -21,12 +21,18 @@ import { WidgetModule } from './modules/widget/widget.module';
     }),
     BullModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        connection: {
-          host: config.get<string>('REDIS_HOST', 'localhost'),
-          port: config.get<number>('REDIS_PORT', 6379),
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const redisUrl = config.get<string>('REDIS_URL');
+        if (redisUrl) {
+          return { connection: { url: redisUrl } } as any;
+        }
+        return {
+          connection: {
+            host: config.get<string>('REDIS_HOST', 'localhost'),
+            port: config.get<number>('REDIS_PORT', 6379),
+          },
+        };
+      },
     }),
     PrismaModule,
     AuthModule,

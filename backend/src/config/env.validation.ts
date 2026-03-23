@@ -1,5 +1,5 @@
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, IsNumber, IsString, MinLength, validateSync } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString, MinLength, validateSync } from 'class-validator';
 
 enum Environment {
   Development = 'development',
@@ -25,15 +25,22 @@ class EnvironmentVariables {
   JWT_EXPIRATION: string;
 
   @IsString()
+  @IsOptional()
   REDIS_HOST: string;
 
   @IsNumber()
+  @IsOptional()
   REDIS_PORT: number;
+
+  @IsString()
+  @IsOptional()
+  REDIS_URL: string;
 
   @IsString()
   GROQ_API_KEY: string;
 
   @IsString()
+  @IsOptional()
   OLLAMA_URL: string;
 }
 
