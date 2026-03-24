@@ -4,7 +4,10 @@ const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 const client = axios.create({
   baseURL: API_BASE,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+  },
 });
 
 client.interceptors.request.use((config) => {
@@ -15,7 +18,7 @@ client.interceptors.request.use((config) => {
       if (state?.token) {
         config.headers.Authorization = `Bearer ${state.token}`;
       }
-    } catch { /* ignore malformed storage */ }
+    } catch { /* ignore */ }
   }
   return config;
 });

@@ -17,7 +17,7 @@ export async function uploadPdf(chatbotId: string, file: File): Promise<Document
   form.append('file', file);
   form.append('chatbotId', chatbotId);
   const res = await client.post<Document>('/ingestion/pdf', form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+    headers: { 'Content-Type': 'multipart/form-data', 'ngrok-skip-browser-warning': 'true' },
   });
   return res.data;
 }
