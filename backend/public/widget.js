@@ -16,11 +16,21 @@
   var botName = 'Chat';
 
   // ── Visitor ID persistence ──
+  function generateSecureId() {
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      var arr = new Uint8Array(16);
+      crypto.getRandomValues(arr);
+      return Array.from(arr, function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+    }
+    // Fallback for very old browsers
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+
   function getVisitorId() {
     var key = 'cw_visitor_' + TOKEN;
     var id = localStorage.getItem(key);
     if (!id) {
-      id = 'v_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      id = 'v_' + generateSecureId();
       localStorage.setItem(key, id);
     }
     return id;
@@ -60,21 +70,21 @@
   var root = document.createElement('div');
   root.id = 'cw-root';
   root.innerHTML = '\
-    <div id="cw-panel">\
+    <div id="cw-panel" role="dialog" aria-label="Chat widget">\
       <div id="cw-header">\
         <h3 id="cw-title">' + escapeHtml(botName) + '</h3>\
-        <button id="cw-close">&times;</button>\
+        <button id="cw-close" aria-label="Close chat">&times;</button>\
       </div>\
       <div id="cw-messages">\
         <div id="cw-greeting">Send a message to start chatting.</div>\
       </div>\
       <form id="cw-form">\
-        <input id="cw-input" type="text" placeholder="Type a message..." autocomplete="off" />\
-        <button id="cw-send" type="submit">Send</button>\
+        <input id="cw-input" type="text" placeholder="Type a message..." autocomplete="off" aria-label="Type a message" />\
+        <button id="cw-send" type="submit" aria-label="Send message">Send</button>\
       </form>\
       <div id="cw-branding">Powered by SaaS Platform</div>\
     </div>\
-    <button id="cw-toggle">\
+    <button id="cw-toggle" aria-label="Open chat">\
       <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>\
     </button>';
   document.body.appendChild(root);
@@ -92,6 +102,7 @@
 
   toggle.addEventListener('click', function () {
     var open = panel.classList.toggle('open');
+    toggle.setAttribute('aria-label', open ? 'Close chat' : 'Open chat');
     if (open) input.focus();
   });
 
@@ -100,6 +111,8 @@
   });
 
   // ── Fetch bot name ──
+  // Note: TOKEN is a public token intentionally exposed in the script tag (data-token).
+  // It identifies the chatbot publicly and is not a secret credential.
   fetch(API + '/api/widget/config?token=' + encodeURIComponent(TOKEN))
     .then(function (r) { return r.json(); })
     .then(function (data) {
@@ -160,7 +173,8 @@
   function appendMessage(role, text) {
     var div = document.createElement('div');
     div.className = 'cw-msg ' + role;
-    div.textContent = text;
+    // escapeHtml is used for both user and assistant messages to prevent XSS
+    div.innerHTML = escapeHtml(text);
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     return div;

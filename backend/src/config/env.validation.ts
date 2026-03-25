@@ -42,6 +42,10 @@ class EnvironmentVariables {
   @IsString()
   @IsOptional()
   OLLAMA_URL: string;
+
+  @IsString()
+  @IsOptional()
+  CORS_ORIGIN: string;
 }
 
 export function validate(config: Record<string, unknown>) {

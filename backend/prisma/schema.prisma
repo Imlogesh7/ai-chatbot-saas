@@ -55,6 +55,7 @@ model Conversation {
   @@index([chatbotId])
   @@index([userId])
   @@index([visitorId])
+  @@index([updatedAt])
   @@map("conversations")
 }
 
@@ -73,6 +74,7 @@ model Message {
   createdAt      DateTime     @default(now()) @map("created_at")
 
   @@index([conversationId])
+  @@index([conversationId, createdAt])
   @@map("messages")
 }
 
@@ -102,6 +104,8 @@ model Document {
   updatedAt  DateTime        @updatedAt @map("updated_at")
 
   @@index([chatbotId])
+  @@index([status])
+  @@index([chatbotId, status])
   @@map("documents")
 }
 

@@ -46,13 +46,22 @@ export class EmbeddingService implements OnModuleInit {
 
   async embedBatch(texts: string[]): Promise<number[][]> {
     if (texts.length === 0) return [];
-    const results: number[][] = [];
-    for (let i = 0; i < texts.length; i++) {
-      if (i > 0 && i % 10 === 0) {
-        this.logger.debug(`Embedding progress: ${i}/${texts.length}`);
-      }
-      results.push(await this.callWithRetry(this.sanitize(texts[i])));
+    const BATCH_CONCURRENCY = 8;
+    const results: number[][] = new Array(texts.length);
+
+    for (let i = 0; i < texts.length; i += BATCH_CONCURRENCY) {
+      const batchIndices = Array.from(
+        { length: Math.min(BATCH_CONCURRENCY, texts.length - i) },
+        (_, j) => i + j,
+      );
+      this.logger.debug(`Embedding batch ${i}–${i + batchIndices.length - 1} of ${texts.length}`);
+      await Promise.all(
+        batchIndices.map(async (idx) => {
+          results[idx] = await this.callWithRetry(this.sanitize(texts[idx]));
+        }),
+      );
     }
+
     this.logger.debug(`Embedded ${results.length} texts via ${this.provider}`);
     return results;
   }

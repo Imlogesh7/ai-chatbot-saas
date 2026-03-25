@@ -3,8 +3,10 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   ParseUUIDPipe,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -72,8 +74,10 @@ export class IngestionController {
   async listDocuments(
     @CurrentUser('id') userId: string,
     @Param('chatbotId', ParseUUIDPipe) chatbotId: string,
+    @Query('page', new ParseIntPipe({ optional: true })) page = 1,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit = 20,
   ) {
-    return this.ingestionService.findAllByChatbot(chatbotId, userId);
+    return this.ingestionService.findAllByChatbot(chatbotId, userId, page, limit);
   }
 
   @Get(':id')

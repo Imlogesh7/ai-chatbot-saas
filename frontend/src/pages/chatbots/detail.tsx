@@ -154,12 +154,19 @@ function ChatTab({ chatbotId }: { chatbotId: string }) {
   const [sending, setSending] = useState(false);
   const [loadingConv, setLoadingConv] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const loadConversations = () => {
     getConversations(chatbotId).then(setConversations).catch(() => {}).finally(() => setLoadingConv(false));
   };
   useEffect(loadConversations, [chatbotId]);
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    return () => { controller.abort(); };
+  }, []);
 
   const selectConversation = async (convId: string) => {
     setActiveConvId(convId);

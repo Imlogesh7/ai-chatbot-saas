@@ -10,6 +10,15 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Trash2, Bot, Loader2 } from 'lucide-react';
 
+function ChatbotCardSkeleton() {
+  return (
+    <div className="animate-pulse bg-gray-800 rounded-lg p-4 h-32">
+      <div className="h-4 bg-gray-700 rounded w-3/4 mb-2" />
+      <div className="h-3 bg-gray-700 rounded w-1/2" />
+    </div>
+  );
+}
+
 export default function ChatbotListPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -97,7 +106,11 @@ export default function ChatbotListPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ChatbotCardSkeleton />
+          <ChatbotCardSkeleton />
+          <ChatbotCardSkeleton />
+        </div>
       ) : bots.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <Bot className="h-12 w-12 text-muted-foreground/50 mb-4" />

@@ -23,12 +23,16 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
+let isLoggingOut = false;
+
 client.interceptors.response.use(
   (res) => res,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !isLoggingOut) {
+      isLoggingOut = true;
       localStorage.removeItem('auth-storage');
       window.location.href = '/login';
+      setTimeout(() => { isLoggingOut = false; }, 3000);
     }
     return Promise.reject(error);
   },

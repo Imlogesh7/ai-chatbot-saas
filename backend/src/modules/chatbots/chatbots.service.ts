@@ -21,11 +21,18 @@ export class ChatbotsService {
     });
   }
 
-  async findAllByUser(userId: string): Promise<Chatbot[]> {
-    return this.prisma.chatbot.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-    });
+  async findAllByUser(userId: string, page = 1, limit = 20): Promise<{ data: Chatbot[]; total: number }> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.chatbot.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: Math.min(limit, 100),
+      }),
+      this.prisma.chatbot.count({ where: { userId } }),
+    ]);
+    return { data, total };
   }
 
   async findOneByUser(id: string, userId: string): Promise<Chatbot> {

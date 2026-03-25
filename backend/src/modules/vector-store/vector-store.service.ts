@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { TextChunk } from '../ingestion/chunker';
+import { EMBEDDING_DIMENSIONS } from '../embedding/embedding.service';
 
 export interface SimilarityResult {
   id: string;
@@ -23,6 +24,34 @@ export class VectorStoreService implements OnModuleInit {
   async onModuleInit() {
     await this.ensureExtension();
     await this.ensureIndex();
+    await this.validateDimensions();
+  }
+
+  private async validateDimensions(): Promise<void> {
+    try {
+      const result = await this.prisma.$queryRawUnsafe<{ dim: number }[]>(
+        `SELECT vector_dims(embedding) AS dim
+         FROM document_chunks
+         WHERE embedding IS NOT NULL
+         LIMIT 1`,
+      );
+      if (result.length > 0) {
+        const storedDim = result[0].dim;
+        if (storedDim !== EMBEDDING_DIMENSIONS) {
+          this.logger.error(
+            `⚠️  DIMENSION MISMATCH: stored embeddings are ${storedDim}-dim but ` +
+            `embedding service produces ${EMBEDDING_DIMENSIONS}-dim. ` +
+            `Run migration 20260325000001_fix_vector_dimensions to clear and fix.`,
+          );
+        } else {
+          this.logger.log(`Vector dimension check passed: ${storedDim}d ✓`);
+        }
+      } else {
+        this.logger.log(`No existing embeddings — dimension check skipped (expected ${EMBEDDING_DIMENSIONS}d)`);
+      }
+    } catch {
+      this.logger.debug('Dimension validation skipped (table may be empty or migration pending)');
+    }
   }
 
   private async ensureExtension(): Promise<void> {
