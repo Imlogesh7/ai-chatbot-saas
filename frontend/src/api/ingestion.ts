@@ -28,6 +28,8 @@ export async function submitUrl(chatbotId: string, url: string): Promise<Documen
 }
 
 export async function listDocuments(chatbotId: string): Promise<Document[]> {
-  const res = await client.get<Document[]>(`/ingestion/chatbot/${chatbotId}`);
-  return Array.isArray(res.data) ? res.data : [];
+  const res = await client.get(`/ingestion/chatbot/${chatbotId}`);
+  if (Array.isArray(res.data)) return res.data;
+  if (res.data?.data && Array.isArray(res.data.data)) return res.data.data;
+  return [];
 }

@@ -72,19 +72,16 @@ export class IngestionService {
     return document;
   }
 
-  async findAllByChatbot(chatbotId: string, userId: string, page = 1, limit = 20): Promise<{ data: Document[]; total: number }> {
+  async findAllByChatbot(
+    chatbotId: string,
+    userId: string,
+  ): Promise<Document[]> {
     await this.chatbotsService.findOneByUser(chatbotId, userId);
-    const skip = (page - 1) * limit;
-    const [data, total] = await this.prisma.$transaction([
-      this.prisma.document.findMany({
-        where: { chatbotId },
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: Math.min(limit, 100),
-      }),
-      this.prisma.document.count({ where: { chatbotId } }),
-    ]);
-    return { data, total };
+
+    return this.prisma.document.findMany({
+      where: { chatbotId },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   async findOne(id: string, userId: string): Promise<Document> {
