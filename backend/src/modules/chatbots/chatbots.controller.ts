@@ -6,10 +6,8 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  ParseIntPipe,
   ParseUUIDPipe,
   Post,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -31,12 +29,8 @@ export class ChatbotsController {
   }
 
   @Get()
-  async findAll(
-    @CurrentUser('id') userId: string,
-    @Query('page', new ParseIntPipe({ optional: true })) page = 1,
-    @Query('limit', new ParseIntPipe({ optional: true })) limit = 20,
-  ) {
-    return this.chatbotsService.findAllByUser(userId, page, limit);
+  async findAll(@CurrentUser('id') userId: string) {
+    return this.chatbotsService.findAllByUser(userId);
   }
 
   @Get(':id')

@@ -11,8 +11,10 @@ export interface Chatbot {
 }
 
 export async function listChatbots(): Promise<Chatbot[]> {
-  const res = await client.get<Chatbot[]>('/chatbots');
-  return Array.isArray(res.data) ? res.data : [];
+  const res = await client.get('/chatbots');
+  if (Array.isArray(res.data)) return res.data;
+  if (res.data?.data && Array.isArray(res.data.data)) return res.data.data;
+  return [];
 }
 
 export async function getChatbot(id: string): Promise<Chatbot> {
