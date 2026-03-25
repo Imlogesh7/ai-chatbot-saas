@@ -58,7 +58,11 @@
     #cw-input:focus{border-color:' + PRIMARY + ';box-shadow:0 0 0 2px ' + PRIMARY + '33}\
     #cw-send{background:' + PRIMARY + ';color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}\
     #cw-send:disabled{opacity:.5;cursor:default}\
-    #cw-greeting{text-align:center;color:#9ca3af;padding:40px 20px;font-size:13px}\
+    #cw-greeting{text-align:center;color:#6b7280;padding:30px 20px;font-size:13px;line-height:1.6}\
+    #cw-greeting strong{display:block;font-size:15px;color:#1f2937;margin-bottom:4px}\
+    #cw-suggestions{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:12px}\
+    #cw-suggestions button{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;padding:5px 12px;font-size:11px;color:#6b7280;cursor:pointer;font-family:inherit}\
+    #cw-suggestions button:hover{background:#e5e7eb;color:#374151}\
     #cw-branding{text-align:center;padding:4px;font-size:10px;color:#d1d5db;flex-shrink:0}\
   ';
 
@@ -76,7 +80,14 @@
         <button id="cw-close" aria-label="Close chat">&times;</button>\
       </div>\
       <div id="cw-messages">\
-        <div id="cw-greeting">Send a message to start chatting.</div>\
+        <div id="cw-greeting">\
+          <strong>👋 Welcome!</strong>\
+          I\'m your AI assistant. Ask me anything about our content.\
+          <div id="cw-suggestions">\
+            <button onclick="document.getElementById(\'cw-input\').value=this.textContent;document.getElementById(\'cw-form\').dispatchEvent(new Event(\'submit\'))">What can you help with?</button>\
+            <button onclick="document.getElementById(\'cw-input\').value=this.textContent;document.getElementById(\'cw-form\').dispatchEvent(new Event(\'submit\'))">Tell me about your services</button>\
+          </div>\
+        </div>\
       </div>\
       <form id="cw-form">\
         <input id="cw-input" type="text" placeholder="Type a message..." autocomplete="off" aria-label="Type a message" />\

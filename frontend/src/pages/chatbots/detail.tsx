@@ -227,8 +227,25 @@ function ChatTab({ chatbotId }: { chatbotId: string }) {
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">
             {messages.length === 0 && (
-              <div className="flex items-center justify-center h-full min-h-[200px]">
-                <p className="text-sm text-muted-foreground">Send a message to start chatting.</p>
+              <div className="flex flex-col items-center justify-center h-full min-h-[250px] text-center px-6">
+                <div className="bg-primary/10 rounded-full p-4 mb-4">
+                  <Send className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold mb-1">Welcome!</h3>
+                <p className="text-sm text-muted-foreground max-w-sm">
+                  I'm your AI assistant trained on your uploaded documents. Ask me anything and I'll answer based on your knowledge base.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-4 justify-center">
+                  {['What can you help me with?', 'Summarize the documents', 'List the key topics'].map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => { setInput(q); }}
+                      className="text-xs bg-muted hover:bg-muted/80 text-muted-foreground px-3 py-1.5 rounded-full cursor-pointer transition-colors"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             {messages.map((msg) => (
