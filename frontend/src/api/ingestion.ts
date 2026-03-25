@@ -29,5 +29,5 @@ export async function submitUrl(chatbotId: string, url: string): Promise<Documen
 
 export async function listDocuments(chatbotId: string): Promise<Document[]> {
   const res = await client.get<Document[]>(`/ingestion/chatbot/${chatbotId}`);
-  return res.data;
+  return Array.isArray(res.data) ? res.data : [];
 }

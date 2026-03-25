@@ -44,7 +44,7 @@ export async function getConversations(chatbotId: string): Promise<Conversation[
   const res = await client.get<Conversation[]>('/chat/conversations', {
     params: { chatbotId },
   });
-  return res.data;
+  return Array.isArray(res.data) ? res.data : [];
 }
 
 export async function getConversation(id: string): Promise<Conversation> {

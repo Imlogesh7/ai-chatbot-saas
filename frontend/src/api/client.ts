@@ -7,10 +7,13 @@ const client = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': 'true',
+    'Accept': 'application/json',
   },
 });
 
 client.interceptors.request.use((config) => {
+  config.headers['ngrok-skip-browser-warning'] = 'true';
+
   const raw = localStorage.getItem('auth-storage');
   if (raw) {
     try {
@@ -26,7 +29,13 @@ client.interceptors.request.use((config) => {
 let isLoggingOut = false;
 
 client.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    const ct = res.headers['content-type'] || '';
+    if (ct.includes('text/html') && typeof res.data === 'string' && res.data.includes('ngrok')) {
+      return Promise.reject(new Error('Ngrok warning page received. Please retry.'));
+    }
+    return res;
+  },
   (error) => {
     if (error.response?.status === 401 && !isLoggingOut) {
       isLoggingOut = true;

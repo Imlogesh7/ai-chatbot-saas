@@ -12,7 +12,7 @@ export interface Chatbot {
 
 export async function listChatbots(): Promise<Chatbot[]> {
   const res = await client.get<Chatbot[]>('/chatbots');
-  return res.data;
+  return Array.isArray(res.data) ? res.data : [];
 }
 
 export async function getChatbot(id: string): Promise<Chatbot> {
