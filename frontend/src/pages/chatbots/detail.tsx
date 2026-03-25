@@ -70,12 +70,25 @@ function DocumentsTab({ chatbotId }: { chatbotId: string }) {
   };
   useEffect(load, [chatbotId]);
 
+  useEffect(() => {
+    const hasProcessing = docs.some((d) => d.status === 'PROCESSING');
+    if (!hasProcessing) return;
+    const interval = setInterval(load, 5000);
+    return () => clearInterval(interval);
+  }, [docs]);
+
   const handleFileUpload = async (file: File) => {
     setError('');
     setUploading(true);
-    try { await uploadPdf(chatbotId, file); load(); }
-    catch (err: any) { setError(err.response?.data?.message || 'Upload failed'); }
-    finally { setUploading(false); if (fileRef.current) fileRef.current.value = ''; }
+    try {
+      const doc = await uploadPdf(chatbotId, file);
+      setDocs((prev) => [doc, ...prev]);
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
   };
 
   const handleUrlSubmit = async (e: FormEvent) => {
@@ -83,9 +96,16 @@ function DocumentsTab({ chatbotId }: { chatbotId: string }) {
     if (!urlInput.trim()) return;
     setError('');
     setSubmittingUrl(true);
-    try { await submitUrl(chatbotId, urlInput.trim()); setUrlInput(''); load(); }
-    catch (err: any) { const msg = err.response?.data?.message; setError(Array.isArray(msg) ? msg[0] : msg || 'Failed'); }
-    finally { setSubmittingUrl(false); }
+    try {
+      const doc = await submitUrl(chatbotId, urlInput.trim());
+      setDocs((prev) => [doc, ...prev]);
+      setUrlInput('');
+    } catch (err: any) {
+      const msg = err.response?.data?.message;
+      setError(Array.isArray(msg) ? msg[0] : msg || err.message || 'Submission failed');
+    } finally {
+      setSubmittingUrl(false);
+    }
   };
 
   const statusVariant = (s: Document['status']): 'default' | 'destructive' | 'secondary' =>
